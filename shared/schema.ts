@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { pgTable, text, serial, integer, boolean, json } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
 
 // Commentary structure schema
 export const comentariuSchema = z.object({
@@ -71,6 +73,44 @@ export const progressSchema = z.object({
   completat: z.boolean(),
 });
 
+// PostgreSQL Tables
+export const comentarii = pgTable("comentarii", {
+  id: text("id").primaryKey(),
+  titlu: text("titlu").notNull(),
+  autor: text("autor").notNull(),
+  tip: text("tip").notNull(), // "poezie" sau "proza"
+  context: text("context").notNull(),
+  trasatura1: text("trasatura1").notNull(),
+  trasatura2: text("trasatura2").notNull(),
+  tehnici: text("tehnici").notNull(),
+  prozodie: text("prozodie"),
+  viziune_despre_viata: text("viziune_despre_viata"),
+  caracterizare_personaje: text("caracterizare_personaje"),
+  incheiere: text("incheiere").notNull(),
+  drills: json("drills").notNull(), // Store drills as JSON
+});
+
+export const progress = pgTable("progress", {
+  id: serial("id").primaryKey(),
+  comentariuId: text("comentariu_id").notNull(),
+  nivel: integer("nivel").notNull(),
+  scor: integer("scor").notNull(),
+  streak: integer("streak").notNull(),
+  completat: boolean("completat").notNull().default(false),
+});
+
+// User table (minimal, pentru future use)
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+});
+
+// Insert schemas
+export const insertComentariuSchema = createInsertSchema(comentarii);
+export const insertProgressSchema = createInsertSchema(progress).omit({ id: true });
+export const insertUserSchema = createInsertSchema(users);
+
 // Export types
 export type Comentariu = z.infer<typeof comentariuSchema>;
 export type MultipleChoiceQuestion = z.infer<typeof multipleChoiceQuestionSchema>;
@@ -81,3 +121,11 @@ export type FreeWriteQuestion = z.infer<typeof freeWriteQuestionSchema>;
 export type Drills = z.infer<typeof drillsSchema>;
 export type ComentariuComplet = z.infer<typeof comentariuCompletSchema>;
 export type Progress = z.infer<typeof progressSchema>;
+
+// Database types
+export type DbComentariu = typeof comentarii.$inferSelect;
+export type DbProgress = typeof progress.$inferSelect;
+export type User = typeof users.$inferSelect;
+export type InsertComentariu = z.infer<typeof insertComentariuSchema>;
+export type InsertProgress = z.infer<typeof insertProgressSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>;
