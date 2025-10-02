@@ -1,0 +1,61 @@
+Prompt complet:
+Vreau să construiești o aplicație web pentru elevi care să exerseze comentarii literare pentru Bacalaureat, folosind HTML, CSS și JS pur. Aplicația trebuie să fie generată **pas cu pas** și să respecte următoarele specificații:
+
+---
+
+### 1️⃣ Structura comentariilor literare
+
+Fiecare comentariu trebuie să aibă următoarea structură, inspirată de comentariul despre poezia „Plumb” de Bacovia:
+
+```js
+const comentariu = {
+  titlu: "Plumb - George Bacovia",
+  tip: "poezie", // poate fi "poezie" sau "proza"
+  context: "...",  // introducerea operei, perioada, curent literar
+  trasatura1: "...", // prima trăsătură literară importantă
+  trasatura2: "...", // a doua trăsătură literară
+  tehnici: "...", // elemente de compoziție, simboluri, tehnici literare
+  prozodie: "...", // detalii despre rimă, măsură, sonoritate (pentru poezie)
+  incheiere: "..." // concluzia, încadrări în curent, mesaj general
+};
+
+
+Pentru proza epică, structura poate fi similară, dar în loc de prozodie să includă secțiuni precum: viziune_despre_viata și caracterizare_personaje.
+
+2️⃣ Drill-uri progresive
+
+Fiecare comentariu va avea 5 niveluri de drill-uri, exemplele trebuie să fie incluse:
+
+Nivel 1 – Recunoaștere: multiple choice, întrebări simple despre context, trăsături sau tehnici.
+
+Nivel 2 – Reconstituire: ordonarea propozițiilor sau fragmentelor corect.
+
+Nivel 3 – Completare în context (cloze): elevul completează cuvinte lipsă în text.
+
+Nivel 4 – Construcție asistată (word bank): elevul construiește fraze dintr-o bancă de cuvinte.
+
+Nivel 5 – Producție completă (free write): elevul scrie paragrafe din memorie, cu verificare exactă sau similaritate.
+
+3️⃣ Structura fișierelor
+
+index.html – afișează lista comentariilor disponibile. Elevul alege un comentariu.
+
+drill.html – încarcă drill-urile pentru comentariul selectat, cu progres bar, scor și streak.
+
+comentarii.js – conține toate comentariile și drill-urile în format JS, respectând structura de mai sus.
+
+style.css – layout curat, responsive, culori pentru feedback corect/greșit, butoane, progres bar.
+
+4️⃣ Cerințe suplimentare pentru AI
+
+Codul să fie generat pas cu pas, în ordinea: index.html → drill.html → comentarii.js → style.css.
+
+Trebuie să fie ușor de extins: adăugarea de noi comentarii și drill-uri să nu necesite rescrierea codului principal.
+
+Funcționează offline complet.
+
+Feedback-ul trebuie să fie vizual, cu culori și text, și să existe progres bar + streak counter.
+
+Folosește doar HTML, CSS și JS pur, fără framework-uri externe.
+
+Include un exemplu complet pentru poezia „Plumb”, cu toate nivelele de drill-uri și textul comentariului complet, adaptat pentru structura propusă.
