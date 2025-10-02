@@ -24,13 +24,21 @@ export default function EditorPage() {
   const { toast } = useToast();
   const isNew = params?.id === "new";
 
-  const [comentariu, setComentariu] = useState(() => {
-    if (!isNew && params?.id) {
-      const existing = storageService.getComentariu(params.id);
-      return existing || getEmptyComentariu();
+  const [comentariu, setComentariu] = useState<ComentariuComplet>(getEmptyComentariu());
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadComentariu() {
+      if (!isNew && params?.id) {
+        const existing = await storageService.getComentariu(params.id);
+        if (existing) {
+          setComentariu(existing);
+        }
+      }
+      setIsLoading(false);
     }
-    return getEmptyComentariu();
-  });
+    loadComentariu();
+  }, [isNew, params?.id]);
 
   function getEmptyComentariu(): ComentariuComplet {
     return {
@@ -56,7 +64,7 @@ export default function EditorPage() {
     };
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!comentariu.comentariu.titlu || !comentariu.comentariu.autor) {
       toast({
         title: "Eroare",
@@ -81,18 +89,26 @@ export default function EditorPage() {
       });
     }
 
-    if (isNew) {
-      storageService.addComentariu(comentariu);
-    } else {
-      storageService.updateComentariu(comentariu.comentariu.id, comentariu);
-    }
+    try {
+      if (isNew) {
+        await storageService.addComentariu(comentariu);
+      } else {
+        await storageService.updateComentariu(comentariu.comentariu.id, comentariu);
+      }
 
-    window.dispatchEvent(new Event("storage-update"));
-    toast({
-      title: "Succes!",
-      description: "Comentariul a fost salvat.",
-    });
-    setTimeout(() => setLocation("/"), 500);
+      window.dispatchEvent(new Event("storage-update"));
+      toast({
+        title: "Succes!",
+        description: "Comentariul a fost salvat.",
+      });
+      setTimeout(() => setLocation("/"), 500);
+    } catch (error) {
+      toast({
+        title: "Eroare",
+        description: "Nu s-a putut salva comentariul",
+        variant: "destructive",
+      });
+    }
   };
 
   // Nivel 1 - Multiple Choice
@@ -270,6 +286,14 @@ export default function EditorPage() {
       drills: { ...comentariu.drills, nivel5: updated },
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Se încarcă...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
