@@ -10,7 +10,7 @@ import Ordonare from "@/components/drills/Ordonare";
 import Completare from "@/components/drills/Completare";
 import WordBank from "@/components/drills/WordBank";
 import FreeWrite from "@/components/drills/FreeWrite";
-import { mockComentarii } from "@/lib/mockData";
+import { storageService } from "@/lib/storage";
 import type { ComentariuComplet } from "@shared/schema";
 
 export default function DrillPage() {
@@ -21,16 +21,52 @@ export default function DrillPage() {
   const [scor, setScor] = useState(0);
   const [streak, setStreak] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
-  const comentariu = mockComentarii.find(
-    (c) => c.comentariu.id === params?.id
-  ) as ComentariuComplet | undefined;
+  const comentariu = storageService.getComentariu(params?.id || "") as ComentariuComplet | undefined;
 
   useEffect(() => {
     if (!match || !comentariu) {
       setLocation("/");
+      return;
     }
-  }, [match, comentariu, setLocation]);
+
+    // Initialize to the first level with questions
+    if (!initialized && comentariu) {
+      let firstNivel = 1;
+      let found = false;
+      
+      while (firstNivel <= 5) {
+        const questions = comentariu.drills[`nivel${firstNivel}` as keyof typeof comentariu.drills] as any[];
+        if (questions && questions.length > 0) {
+          setNivel(firstNivel);
+          setQuestionIndex(0);
+          found = true;
+          break;
+        }
+        firstNivel++;
+      }
+
+      if (!found) {
+        // No drills at all, mark as completed immediately
+        setCompleted(true);
+      }
+      
+      setInitialized(true);
+    }
+  }, [match, comentariu, setLocation, initialized]);
+
+  useEffect(() => {
+    if (comentariu && completed) {
+      storageService.updateProgress(
+        comentariu.comentariu.id,
+        nivel,
+        scor,
+        streak,
+        true
+      );
+    }
+  }, [completed, comentariu, nivel, scor, streak]);
 
   if (!comentariu) return null;
 
@@ -42,12 +78,34 @@ export default function DrillPage() {
       setStreak(0);
     }
 
+    // Save progress after each question
+    if (comentariu) {
+      storageService.updateProgress(
+        comentariu.comentariu.id,
+        nivel,
+        scor + (correct ? 5 : 0),
+        correct ? streak + 1 : 0,
+        false
+      );
+    }
+
     const questions = getCurrentQuestions();
     if (questionIndex < questions.length - 1) {
       setQuestionIndex((prev) => prev + 1);
     } else if (nivel < 5) {
-      setNivel((prev) => prev + 1);
-      setQuestionIndex(0);
+      // Try to advance to next level, but skip empty levels
+      let nextNivel = nivel + 1;
+      while (nextNivel <= 5) {
+        const nextQuestions = comentariu.drills[`nivel${nextNivel}` as keyof typeof comentariu.drills] as any[];
+        if (nextQuestions && nextQuestions.length > 0) {
+          setNivel(nextNivel);
+          setQuestionIndex(0);
+          return;
+        }
+        nextNivel++;
+      }
+      // All remaining levels are empty, mark as completed
+      setCompleted(true);
     } else {
       setCompleted(true);
     }
@@ -73,6 +131,11 @@ export default function DrillPage() {
 
   const questions = getCurrentQuestions();
   const currentQuestion = questions[questionIndex] as any;
+
+  // Don't render until initialized
+  if (!initialized) {
+    return null;
+  }
 
   if (completed) {
     return (

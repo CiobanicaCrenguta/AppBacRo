@@ -1,11 +1,12 @@
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, FileText, Play, Edit } from "lucide-react";
-import type { Comentariu } from "@shared/schema";
+import { BookOpen, FileText, Play, Edit, AlertCircle } from "lucide-react";
+import type { Comentariu, Drills } from "@shared/schema";
 
 interface ComentariuCardProps {
   comentariu: Comentariu;
+  drills?: Drills;
   onStart?: () => void;
   onEdit?: () => void;
   showEdit?: boolean;
@@ -13,11 +14,26 @@ interface ComentariuCardProps {
 
 export default function ComentariuCard({
   comentariu,
+  drills,
   onStart,
   onEdit,
   showEdit = false,
 }: ComentariuCardProps) {
   const Icon = comentariu.tip === "poezie" ? BookOpen : FileText;
+
+  // Check if there are any drills
+  const hasDrills = drills && (
+    drills.nivel1.length > 0 ||
+    drills.nivel2.length > 0 ||
+    drills.nivel3.length > 0 ||
+    drills.nivel4.length > 0 ||
+    drills.nivel5.length > 0
+  );
+
+  const totalDrills = drills 
+    ? drills.nivel1.length + drills.nivel2.length + drills.nivel3.length + 
+      drills.nivel4.length + drills.nivel5.length
+    : 0;
 
   return (
     <Card className="hover-elevate transition-all duration-200">
@@ -33,19 +49,39 @@ export default function ComentariuCard({
         </div>
         <p className="text-sm text-muted-foreground">{comentariu.autor}</p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
         <p className="text-sm line-clamp-3 text-muted-foreground">
           {comentariu.context}
         </p>
+        {drills && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {!hasDrills && (
+              <>
+                <AlertCircle className="h-4 w-4 text-warning" />
+                <span>Fără exerciții</span>
+              </>
+            )}
+            {hasDrills && (
+              <span>{totalDrills} exerciții în {[
+                drills.nivel1.length > 0 ? 1 : 0,
+                drills.nivel2.length > 0 ? 1 : 0,
+                drills.nivel3.length > 0 ? 1 : 0,
+                drills.nivel4.length > 0 ? 1 : 0,
+                drills.nivel5.length > 0 ? 1 : 0,
+              ].reduce((a, b) => a + b, 0)} niveluri</span>
+            )}
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex gap-2 pt-4">
         <Button
           className="flex-1"
           onClick={onStart}
+          disabled={!hasDrills}
           data-testid="button-start-drill"
         >
           <Play className="h-4 w-4 mr-2" />
-          Începe exercițiile
+          {hasDrills ? "Începe exercițiile" : "Fără exerciții"}
         </Button>
         {showEdit && (
           <Button

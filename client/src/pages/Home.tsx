@@ -1,17 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import ComentariuCard from "@/components/ComentariuCard";
 import { mockComentarii } from "@/lib/mockData";
+import { storageService } from "@/lib/storage";
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const [comentarii] = useState(() => {
-    // todo: remove mock functionality - Load from localStorage
-    const saved = localStorage.getItem("comentarii");
-    return saved ? JSON.parse(saved) : mockComentarii;
+  const [comentarii, setComentarii] = useState(() => {
+    storageService.initializeWithMockData(mockComentarii);
+    return storageService.getComentarii();
   });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setComentarii(storageService.getComentarii());
+    };
+    
+    window.addEventListener("storage-update", handleStorage);
+    return () => window.removeEventListener("storage-update", handleStorage);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,10 +42,11 @@ export default function Home() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {comentarii.map((item: any) => (
+          {comentarii.map((item) => (
             <ComentariuCard
               key={item.comentariu.id}
               comentariu={item.comentariu}
+              drills={item.drills}
               onStart={() => setLocation(`/drill/${item.comentariu.id}`)}
               onEdit={() => setLocation(`/editor/${item.comentariu.id}`)}
               showEdit={true}
