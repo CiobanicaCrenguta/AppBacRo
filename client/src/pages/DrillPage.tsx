@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Trophy } from "lucide-react";
@@ -23,10 +24,22 @@ export default function DrillPage() {
   const [completed, setCompleted] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
-  const comentariu = storageService.getComentariu(params?.id || "") as ComentariuComplet | undefined;
+  const { data: comentariu, isLoading } = useQuery<ComentariuComplet | undefined>({
+    queryKey: ['/api/comentarii', params?.id],
+    enabled: !!params?.id,
+  });
 
   useEffect(() => {
-    if (!match || !comentariu) {
+    if (!match) {
+      setLocation("/");
+      return;
+    }
+    
+    if (isLoading) {
+      return;
+    }
+    
+    if (!comentariu) {
       setLocation("/");
       return;
     }
@@ -54,7 +67,7 @@ export default function DrillPage() {
       
       setInitialized(true);
     }
-  }, [match, comentariu, setLocation, initialized]);
+  }, [match, comentariu, setLocation, initialized, isLoading]);
 
   useEffect(() => {
     if (comentariu && completed) {
@@ -68,7 +81,7 @@ export default function DrillPage() {
     }
   }, [completed, comentariu, nivel, scor, streak]);
 
-  if (!comentariu) return null;
+  if (isLoading || !comentariu) return null;
 
   const handleAnswer = (correct: boolean) => {
     if (correct) {
@@ -112,18 +125,20 @@ export default function DrillPage() {
   };
 
   const getCurrentQuestions = () => {
+    if (!comentariu?.drills) return [];
+    
     const drills = comentariu.drills;
     switch (nivel) {
       case 1:
-        return drills.nivel1;
+        return drills.nivel1 || [];
       case 2:
-        return drills.nivel2;
+        return drills.nivel2 || [];
       case 3:
-        return drills.nivel3;
+        return drills.nivel3 || [];
       case 4:
-        return drills.nivel4;
+        return drills.nivel4 || [];
       case 5:
-        return drills.nivel5;
+        return drills.nivel5 || [];
       default:
         return [];
     }

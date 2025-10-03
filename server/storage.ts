@@ -216,6 +216,14 @@ export class PostgresStorage implements IStorage {
 
   // Helper method to convert DB record to ComentariuComplet
   private dbToComentariuComplet(dbComentariu: DbComentariu): ComentariuComplet {
+    const drills = dbComentariu.drills || {
+      nivel1: [],
+      nivel2: [],
+      nivel3: [],
+      nivel4: [],
+      nivel5: [],
+    };
+    
     return {
       comentariu: {
         id: dbComentariu.id,
@@ -232,7 +240,7 @@ export class PostgresStorage implements IStorage {
           dbComentariu.caracterizare_personaje ?? undefined,
         incheiere: dbComentariu.incheiere,
       },
-      drills: dbComentariu.drills as Drills,
+      drills: drills as Drills,
     };
   }
 }
