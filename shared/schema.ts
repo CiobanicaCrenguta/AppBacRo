@@ -24,18 +24,21 @@ export const multipleChoiceQuestionSchema = z.object({
   intrebare: z.string(),
   optiuni: z.array(z.string()),
   raspunsCorect: z.number(), // index of correct answer
+  indiciu: z.string().optional(), // hint
 });
 
 export const ordonareQuestionSchema = z.object({
   id: z.string(),
   fragmente: z.array(z.string()), // fragments in random order
   ordineCorecta: z.array(z.number()), // correct order indices
+  indiciu: z.string().optional(), // hint
 });
 
 export const completareQuestionSchema = z.object({
   id: z.string(),
   text: z.string(), // text with _____ for blanks
   raspunsuri: z.array(z.string()), // correct answers for each blank
+  indiciu: z.string().optional(), // hint
 });
 
 export const wordBankQuestionSchema = z.object({
@@ -43,12 +46,14 @@ export const wordBankQuestionSchema = z.object({
   instructiune: z.string(),
   cuvinte: z.array(z.string()), // word bank
   fraza_corecta: z.string(), // correct sentence
+  indiciu: z.string().optional(), // hint
 });
 
 export const freeWriteQuestionSchema = z.object({
   id: z.string(),
   instructiune: z.string(),
   raspuns_referinta: z.string(), // reference answer
+  indiciu: z.string().optional(), // hint
 });
 
 export const drillsSchema = z.object({
