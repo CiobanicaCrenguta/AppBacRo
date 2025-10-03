@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Lightbulb } from "lucide-react";
 import FeedbackMessage from "../FeedbackMessage";
 import type { MultipleChoiceQuestion } from "@shared/schema";
 
@@ -12,6 +13,7 @@ interface MultipleChoiceProps {
 export default function MultipleChoice({ question, onAnswer }: MultipleChoiceProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   const handleSelect = (index: number) => {
     if (!submitted) {
@@ -30,7 +32,27 @@ export default function MultipleChoice({ question, onAnswer }: MultipleChoicePro
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-medium">{question.intrebare}</h2>
+      <div className="space-y-3">
+        <h2 className="text-lg font-medium">{question.intrebare}</h2>
+        {question.indiciu && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowHint(!showHint)}
+              data-testid="button-hint"
+            >
+              <Lightbulb className="h-4 w-4 mr-2" />
+              {showHint ? "Ascunde indiciu" : "Arată indiciu"}
+            </Button>
+          </div>
+        )}
+        {showHint && question.indiciu && (
+          <Card className="p-4 bg-accent/50">
+            <p className="text-sm">{question.indiciu}</p>
+          </Card>
+        )}
+      </div>
       <div className="grid gap-3">
         {question.optiuni.map((optiune, index) => (
           <Card

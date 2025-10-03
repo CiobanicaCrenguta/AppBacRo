@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Lightbulb } from "lucide-react";
 import FeedbackMessage from "../FeedbackMessage";
 import type { FreeWriteQuestion } from "@shared/schema";
 
@@ -12,6 +14,7 @@ interface FreeWriteProps {
 export default function FreeWrite({ question, onAnswer }: FreeWriteProps) {
   const [answer, setAnswer] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   const handleSubmit = () => {
     setSubmitted(true);
@@ -26,7 +29,27 @@ export default function FreeWrite({ question, onAnswer }: FreeWriteProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-medium">{question.instructiune}</h2>
+      <div className="space-y-3">
+        <h2 className="text-lg font-medium">{question.instructiune}</h2>
+        {question.indiciu && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowHint(!showHint)}
+              data-testid="button-hint"
+            >
+              <Lightbulb className="h-4 w-4 mr-2" />
+              {showHint ? "Ascunde indiciu" : "Arată indiciu"}
+            </Button>
+          </div>
+        )}
+        {showHint && question.indiciu && (
+          <Card className="p-4 bg-accent/50">
+            <p className="text-sm">{question.indiciu}</p>
+          </Card>
+        )}
+      </div>
 
       <Textarea
         value={answer}

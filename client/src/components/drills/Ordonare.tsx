@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { GripVertical, MoveUp, MoveDown } from "lucide-react";
+import { GripVertical, MoveUp, MoveDown, Lightbulb } from "lucide-react";
 import FeedbackMessage from "../FeedbackMessage";
 import type { OrdonareQuestion } from "@shared/schema";
 
@@ -16,6 +16,7 @@ export default function Ordonare({ question, onAnswer }: OrdonareProps) {
     return [...question.fragmente].map((text, index) => ({ text, originalIndex: index }));
   });
   const [submitted, setSubmitted] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   const moveUp = (index: number) => {
     if (index === 0 || submitted) return;
@@ -43,7 +44,27 @@ export default function Ordonare({ question, onAnswer }: OrdonareProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-medium">Ordonează fragmentele în ordine corectă:</h2>
+      <div className="space-y-3">
+        <h2 className="text-lg font-medium">Ordonează fragmentele în ordine corectă:</h2>
+        {question.indiciu && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowHint(!showHint)}
+              data-testid="button-hint"
+            >
+              <Lightbulb className="h-4 w-4 mr-2" />
+              {showHint ? "Ascunde indiciu" : "Arată indiciu"}
+            </Button>
+          </div>
+        )}
+        {showHint && question.indiciu && (
+          <Card className="p-4 bg-accent/50">
+            <p className="text-sm">{question.indiciu}</p>
+          </Card>
+        )}
+      </div>
       <div className="space-y-3">
         {fragments.map((fragment, index) => {
           const correctPosition = question.ordineCorecta.indexOf(fragment.originalIndex);

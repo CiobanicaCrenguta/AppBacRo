@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { X, Lightbulb } from "lucide-react";
 import FeedbackMessage from "../FeedbackMessage";
 import type { WordBankQuestion } from "@shared/schema";
 
@@ -14,6 +14,7 @@ interface WordBankProps {
 export default function WordBank({ question, onAnswer }: WordBankProps) {
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   const handleWordClick = (word: string) => {
     if (!submitted) {
@@ -49,7 +50,27 @@ export default function WordBank({ question, onAnswer }: WordBankProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-medium">{question.instructiune}</h2>
+      <div className="space-y-3">
+        <h2 className="text-lg font-medium">{question.instructiune}</h2>
+        {question.indiciu && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowHint(!showHint)}
+              data-testid="button-hint"
+            >
+              <Lightbulb className="h-4 w-4 mr-2" />
+              {showHint ? "Ascunde indiciu" : "Arată indiciu"}
+            </Button>
+          </div>
+        )}
+        {showHint && question.indiciu && (
+          <Card className="p-4 bg-accent/50">
+            <p className="text-sm">{question.indiciu}</p>
+          </Card>
+        )}
+      </div>
 
       <Card className="p-4 min-h-24 bg-muted/30">
         <div className="flex flex-wrap gap-2">
