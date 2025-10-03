@@ -14,6 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { storageService } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
 import type { ComentariuComplet, MultipleChoiceQuestion, OrdonareQuestion, CompletareQuestion, WordBankQuestion, FreeWriteQuestion } from "@shared/schema";
@@ -26,6 +34,8 @@ export default function EditorPage() {
 
   const [comentariu, setComentariu] = useState<ComentariuComplet>(getEmptyComentariu());
   const [isLoading, setIsLoading] = useState(true);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     async function loadComentariu() {
@@ -89,8 +99,28 @@ export default function EditorPage() {
       });
     }
 
+    // For new commentaries, require password
+    if (isNew) {
+      setShowPasswordDialog(true);
+      return;
+    }
+
+    // For updates, save directly
+    await performSave();
+  };
+
+  const performSave = async () => {
     try {
       if (isNew) {
+        // Validate password
+        if (password !== "GeorgeAndoneVasiliu") {
+          toast({
+            title: "Eroare",
+            description: "Parolă incorectă",
+            variant: "destructive",
+          });
+          return;
+        }
         await storageService.addComentariu(comentariu);
       } else {
         await storageService.updateComentariu(comentariu.comentariu.id, comentariu);
@@ -101,6 +131,8 @@ export default function EditorPage() {
         title: "Succes!",
         description: "Comentariul a fost salvat.",
       });
+      setShowPasswordDialog(false);
+      setPassword("");
       setTimeout(() => setLocation("/"), 500);
     } catch (error) {
       toast({
@@ -816,6 +848,42 @@ export default function EditorPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Introdu parola</DialogTitle>
+            <DialogDescription>
+              Pentru a adăuga un comentariu nou, trebuie să introduci parola.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Input
+              type="password"
+              placeholder="Parolă"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  performSave();
+                }
+              }}
+              data-testid="input-password"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setShowPasswordDialog(false);
+              setPassword("");
+            }}>
+              Anulează
+            </Button>
+            <Button onClick={performSave} data-testid="button-confirm-save">
+              Salvează
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
