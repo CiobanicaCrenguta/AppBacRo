@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Home from "@/pages/Home";
 import DrillPage from "@/pages/DrillPage";
 import EditorPage from "@/pages/EditorPage";
+import PracticeByLevelPage from "@/pages/PracticeByLevelPage";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/drill/:id" component={DrillPage} />
       <Route path="/editor/:id" component={EditorPage} />
+      <Route path="/practice/:nivel" component={PracticeByLevelPage} />
       <Route component={NotFound} />
     </Switch>
   );
