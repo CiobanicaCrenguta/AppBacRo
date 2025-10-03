@@ -601,6 +601,17 @@ export default function EditorPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Indiciu (opțional)</Label>
+                  <Input
+                    value={q.indiciu || ""}
+                    onChange={(e) =>
+                      updateMultipleChoice(index, "indiciu", e.target.value)
+                    }
+                    placeholder="Adaugă un indiciu pentru elevi..."
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Opțiuni de răspuns</Label>
                   {q.optiuni.map((opt, oIndex) => (
                     <div key={oIndex} className="flex gap-2 items-center">
@@ -655,6 +666,17 @@ export default function EditorPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Indiciu (opțional)</Label>
+                  <Input
+                    value={q.indiciu || ""}
+                    onChange={(e) =>
+                      updateOrdonare(index, "indiciu", e.target.value)
+                    }
+                    placeholder="Adaugă un indiciu pentru elevi..."
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Fragmente (în ordinea corectă)</Label>
                   {q.fragmente.map((frag, fIndex) => (
                     <Textarea
@@ -697,6 +719,17 @@ export default function EditorPage() {
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Indiciu (opțional)</Label>
+                  <Input
+                    value={q.indiciu || ""}
+                    onChange={(e) =>
+                      updateCompletare(index, "indiciu", e.target.value)
+                    }
+                    placeholder="Adaugă un indiciu pentru elevi..."
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -766,6 +799,17 @@ export default function EditorPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Indiciu (opțional)</Label>
+                  <Input
+                    value={q.indiciu || ""}
+                    onChange={(e) =>
+                      updateWordBank(index, "indiciu", e.target.value)
+                    }
+                    placeholder="Adaugă un indiciu pentru elevi..."
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Cuvinte (separate prin virgulă)</Label>
                   <Input
                     value={q.cuvinte.join(", ")}
@@ -829,6 +873,17 @@ export default function EditorPage() {
                       updateFreeWrite(index, "instructiune", e.target.value)
                     }
                     placeholder="Scrie un paragraf despre..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Indiciu (opțional)</Label>
+                  <Input
+                    value={q.indiciu || ""}
+                    onChange={(e) =>
+                      updateFreeWrite(index, "indiciu", e.target.value)
+                    }
+                    placeholder="Adaugă un indiciu pentru elevi..."
                   />
                 </div>
 
