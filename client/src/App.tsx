@@ -9,6 +9,7 @@ import Home from "@/pages/Home";
 import DrillPage from "@/pages/DrillPage";
 import EditorPage from "@/pages/EditorPage";
 import PracticeByLevelPage from "@/pages/PracticeByLevelPage";
+import ViewComentariuPage from "@/pages/ViewComentariuPage";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/drill/:id" component={DrillPage} />
       <Route path="/editor/:id" component={EditorPage} />
       <Route path="/practice/:nivel" component={PracticeByLevelPage} />
+      <Route path="/view/:id" component={ViewComentariuPage} />
       <Route component={NotFound} />
     </Switch>
   );

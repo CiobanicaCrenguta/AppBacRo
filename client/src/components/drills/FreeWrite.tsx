@@ -21,7 +21,7 @@ export default function FreeWrite({ question, onAnswer }: FreeWriteProps) {
     // Simple similarity check - can be enhanced
     const similarity = calculateSimilarity(answer, question.raspuns_referinta);
     const isCorrect = similarity > 0.5; // 50% similarity threshold
-    setTimeout(() => onAnswer(isCorrect), 2000);
+    setTimeout(() => onAnswer(isCorrect), 15000);
   };
 
   const similarity = calculateSimilarity(answer, question.raspuns_referinta);

@@ -3,7 +3,7 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BookOpen, FileText, Play, Edit, Trash2, AlertCircle } from "lucide-react";
+import { BookOpen, FileText, Play, Edit, Trash2, AlertCircle, Eye } from "lucide-react";
 import type { Comentariu, Drills } from "@shared/schema";
 import {
   AlertDialog,
@@ -19,6 +19,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { storageService } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 interface ComentariuCardProps {
   comentariu: Comentariu;
@@ -27,6 +28,7 @@ interface ComentariuCardProps {
   onEdit?: () => void;
   onDelete?: () => void;
   showEdit?: boolean;
+  onView?: () => void;
 }
 
 export default function ComentariuCard({
@@ -36,14 +38,15 @@ export default function ComentariuCard({
   onEdit,
   onDelete,
   showEdit = false,
+  onView,
 }: ComentariuCardProps) {
   const Icon = comentariu.tip === "poezie" ? BookOpen : FileText;
   const { toast } = useToast();
   const [password, setPassword] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [, setLocation] = useLocation();
 
-  // Check if there are any drills
   const hasDrills = drills && (
     drills.nivel1.length > 0 ||
     drills.nivel2.length > 0 ||
@@ -76,9 +79,7 @@ export default function ComentariuCard({
       });
       setIsDialogOpen(false);
       setPassword("");
-      if (onDelete) {
-        onDelete();
-      }
+      if (onDelete) onDelete();
       window.dispatchEvent(new Event("storage-update"));
     } catch (error: any) {
       toast({
@@ -105,6 +106,7 @@ export default function ComentariuCard({
         </div>
         <p className="text-sm text-muted-foreground">{comentariu.autor}</p>
       </CardHeader>
+
       <CardContent className="space-y-3">
         <p className="text-sm line-clamp-3 text-muted-foreground">
           {comentariu.context}
@@ -129,6 +131,7 @@ export default function ComentariuCard({
           </div>
         )}
       </CardContent>
+
       <CardFooter className="flex gap-2 pt-4">
         <Button
           className="flex-1"
@@ -139,6 +142,7 @@ export default function ComentariuCard({
           <Play className="h-4 w-4 mr-2" />
           {hasDrills ? "Începe exercițiile" : "Fără exerciții"}
         </Button>
+
         {showEdit && (
           <>
             <Button
@@ -149,13 +153,10 @@ export default function ComentariuCard({
             >
               <Edit className="h-4 w-4" />
             </Button>
+
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  data-testid="button-delete"
-                >
+                <Button variant="outline" size="icon" data-testid="button-delete">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </AlertDialogTrigger>
@@ -177,9 +178,7 @@ export default function ComentariuCard({
                     placeholder="Introdu parola"
                     data-testid="input-delete-password"
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleDelete();
-                      }
+                      if (e.key === "Enter") handleDelete();
                     }}
                   />
                 </div>
@@ -202,6 +201,19 @@ export default function ComentariuCard({
             </AlertDialog>
           </>
         )}
+
+        {/* Buton vizualizare completă */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => {
+            if (onView) onView();
+            else setLocation(`/view/${comentariu.id}`);
+          }}
+          data-testid="button-view"
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
       </CardFooter>
     </Card>
   );
