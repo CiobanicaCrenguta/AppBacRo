@@ -35,7 +35,7 @@ export default function WordBank({ question, onAnswer }: WordBankProps) {
     const userSentence = selectedWords.join(" ").toLowerCase().trim();
     const correctSentence = question.fraza_corecta.toLowerCase().trim();
     const isCorrect = userSentence === correctSentence;
-    setTimeout(() => onAnswer(isCorrect), 1500);
+    setTimeout(() => onAnswer(isCorrect), 3000);
   };
 
   const availableWords = question.cuvinte.filter((word) => {

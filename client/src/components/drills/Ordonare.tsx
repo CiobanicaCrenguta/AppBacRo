@@ -10,10 +10,24 @@ interface OrdonareProps {
   onAnswer: (correct: boolean) => void;
 }
 
+// 🔥 Funcție mică de shuffle (amestecare aleatorie)
+function shuffleArray<T>(array: T[]): T[] {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 export default function Ordonare({ question, onAnswer }: OrdonareProps) {
   const [fragments, setFragments] = useState(() => {
-    // Shuffle fragments for initial display
-    return [...question.fragmente].map((text, index) => ({ text, originalIndex: index }));
+    // 🔄 Shuffle fragments for initial display
+    const shuffled = shuffleArray([...question.fragmente]);
+    return shuffled.map((text) => ({
+      text,
+      originalIndex: question.fragmente.indexOf(text),
+    }));
   });
   const [submitted, setSubmitted] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -21,31 +35,41 @@ export default function Ordonare({ question, onAnswer }: OrdonareProps) {
   const moveUp = (index: number) => {
     if (index === 0 || submitted) return;
     const newFragments = [...fragments];
-    [newFragments[index - 1], newFragments[index]] = [newFragments[index], newFragments[index - 1]];
+    [newFragments[index - 1], newFragments[index]] = [
+      newFragments[index],
+      newFragments[index - 1],
+    ];
     setFragments(newFragments);
   };
 
   const moveDown = (index: number) => {
     if (index === fragments.length - 1 || submitted) return;
     const newFragments = [...fragments];
-    [newFragments[index], newFragments[index + 1]] = [newFragments[index + 1], newFragments[index]];
+    [newFragments[index], newFragments[index + 1]] = [
+      newFragments[index + 1],
+      newFragments[index],
+    ];
     setFragments(newFragments);
   };
 
   const handleSubmit = () => {
     setSubmitted(true);
     const currentOrder = fragments.map((f) => f.originalIndex);
-    const isCorrect = JSON.stringify(currentOrder) === JSON.stringify(question.ordineCorecta);
+    const isCorrect =
+      JSON.stringify(currentOrder) === JSON.stringify(question.ordineCorecta);
     setTimeout(() => onAnswer(isCorrect), 1500);
   };
 
   const currentOrder = fragments.map((f) => f.originalIndex);
-  const isCorrect = JSON.stringify(currentOrder) === JSON.stringify(question.ordineCorecta);
+  const isCorrect =
+    JSON.stringify(currentOrder) === JSON.stringify(question.ordineCorecta);
 
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <h2 className="text-lg font-medium">Ordonează fragmentele în ordine corectă:</h2>
+        <h2 className="text-lg font-medium">
+          Ordonează fragmentele în ordine corectă:
+        </h2>
         {question.indiciu && (
           <div className="flex gap-2">
             <Button
@@ -65,9 +89,11 @@ export default function Ordonare({ question, onAnswer }: OrdonareProps) {
           </Card>
         )}
       </div>
+
       <div className="space-y-3">
         {fragments.map((fragment, index) => {
-          const correctPosition = question.ordineCorecta.indexOf(fragment.originalIndex);
+          const correctPosition =
+            question.ordineCorecta.indexOf(fragment.originalIndex);
           const isInCorrectPosition = submitted && index === correctPosition;
           const isInWrongPosition = submitted && index !== correctPosition;
 
@@ -76,7 +102,9 @@ export default function Ordonare({ question, onAnswer }: OrdonareProps) {
               key={index}
               className={`p-4 ${
                 isInCorrectPosition ? "border-success bg-success/10" : ""
-              } ${isInWrongPosition ? "border-destructive bg-destructive/10" : ""}`}
+              } ${
+                isInWrongPosition ? "border-destructive bg-destructive/10" : ""
+              }`}
               data-testid={`fragment-${index}`}
             >
               <div className="flex items-start gap-3">
